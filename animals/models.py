@@ -1,5 +1,6 @@
 """Модели приложения animals."""
 
+from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -73,25 +74,48 @@ class Animal(models.Model):
         verbose_name = 'животное'
         verbose_name_plural = 'животные'
 
+    def _declension(self, age, one, two, five):
+        """Подобрать склонение для возраста животного.
+
+        Пример: _declension(3, 'год', 'года', 'лет') → 'года'.
+        """
+        if 11 <= age % 100 <= 19:
+            return five
+        if age % 10 == 1:
+            return one
+        if 2 <= age % 10 <= 4:
+            return two
+        return five
+
     @property
     def age(self) -> int:
-        """Вернуть возраст животного (полных лет) на данный момент."""
-        today = timezone.now().date()
-        age = today.year - self.birth_date.year
-        if ((today.month, today.day) <
-                (self.birth_date.month, self.birth_date.day)):
-            age -= 1
-        return age
+        """Вернуть возраст животного на данный момент."""
+        if not self.birth_date:
+            return "возраст неизвестен"
+        age = relativedelta(timezone.now().date(), self.birth_date)
+        if age.years >= 1:
+            return (f'{age.years} '
+                    f'{self._declension(age.years, 'год', 'года', 'лет')}')
+        elif age.months >= 1:
+            return (f'{age.months} '
+                    f'{self._declension(
+                        age.months, 'месяц', 'месяца', 'месяцев')}')
+        elif age.days >= 1:
+            return (f'{age.days} '
+                    f'{self._declension(age.days, 'день', 'дня', 'дней')}')
+        else:
+            return "новорожденный"
 
     def save(self, *args, **kwargs) -> None:
         """Сформировать слаг из имени с номером при дублировании."""
-        base_slug = slugify(self.name)
-        slug = base_slug
-        counter = 1
-        while Animal.objects.filter(slug=slug).exists():
-            slug = f'{base_slug}-{counter}'
-            counter += 1
-        self.slug = slug
+        if not self.slug:
+            base_slug = slugify(self.name)
+            slug = base_slug
+            counter = 1
+            while Animal.objects.filter(slug=slug).exists():
+                slug = f'{base_slug}-{counter}'
+                counter += 1
+            self.slug = slug
         super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:

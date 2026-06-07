@@ -1,0 +1,18 @@
+<div class="col-md-4 mb-4">
+  <div class="card h-100 shadow-sm">
+    <img
+      src={% static 'img/no-photo.png' %}
+      class="card-img-top"
+      alt="{{ animal.species }} {{ animal.name }}">
+    <div class="card-body">
+      <h5 class="card-title">{{ animal.name }}</h5>
+      <p class="card-text text-muted">
+        {{ animal.species }}, {{ animal.age }}
+      </p>
+      <p class="card-text">{{ animal.bio|truncatechars:100 }}</p>
+      <a href="{% url 'animals:animal_detail' %}" class="btn btn-primary">
+        Подробнее
+      </a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content%}
+  <section class="
+    jumbotron jumbotron-fluid
+    bg-light rounded
+    p-5 mb-5
+    text-center">
+    <div class="container">
+      <h1 class="display-4">Помоги найти дом пушистому другу</h1>
+      <p class="lead mt-3">
+        Мы спасаем животных, заботимся о них и находим любящие семьи. 
+        Каждый питомец заслуживает второй шанс.
+      </p>
+      <div class="mt-4">
+        <a
+          href="{% url 'animals:catalog' %}"
+          class="btn btn-primary btn-lg me-3">
+          Посмотреть подопечных
+        </a>
+        <a
+          href="{% url 'animals:stories' %}"
+          class="btn btn-outline-success btn-lg">
+          Счастливые истории
+        </a>
+      </div>
+    </div>
+  </section>
+  <div class="row text-center mb-5">
+    <div class="col-md-6 mb-3">
+      <div class="border rounded p-4 bg-white shadow-sm">
+        <h2 class="display-5 text-warning">{{ shelter_count }}</h2>
+        <p class="lead">сейчас в приюте</p>
+      </div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <div class="border rounded p-4 bg-white shadow-sm">
+        <h2 class="display-5 text-success">{{ adopted_count }}</h2>
+        <p class="lead">уже дома</p>
+      </div>
+    </div>
+  </div>
+  <section>
+    <h2 class="mb-4">Совсем недавно в приюте</h2>
+    <div class="row">
+      {% for animal in recent_animals %}
+        {% include "includes/animal_card.html" %}
+      {% endfor %}
+    </div>
+    <div class="text-center mt-3">
+      <a
+        href="{% url 'animals:catalog' %}"
+        class="btn btn-outline-primary btn-lg">
+        Смотреть всех питомцев
+      </a>
+    </div>
+  </section>
+{% endblock %}
