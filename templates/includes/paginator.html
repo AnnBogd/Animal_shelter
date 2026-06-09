@@ -1,0 +1,53 @@
+{% if page_obj.has_other_pages %}
+  <nav aria-label="Навигация по страницам" class="mt-4">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+        <li class="page-item disabled">
+          <a
+            class="page-link"
+            href="?page=1"
+            tabindex="-1"
+            aria-disabled="true">
+            Первая
+          </a>
+        </li>
+        <li class="page-item disabled">
+          <a
+            class="page-link"
+            href="?page={{ page_obj.previous_page_number }}"
+            tabindex="-1"
+            aria-disabled="true">
+            Предыдущая
+          </a>
+        </li>
+      {% endif %}
+      {% for idx in page_obj.paginator.page_range %}
+        {% if page_obj.number == idx %}
+          <li class="page-item active">
+            <span class="page-link">{{ idx }}</span>
+          </li>
+        {% else %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="?page={{ idx }}">
+              {{ idx }}
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+            Следующая
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+            Последняя
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}

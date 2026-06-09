@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Счастливые истории — Приют «Добрый дом»{% endblock %}
+{% block content %}
+<div class="mb-4">
+  <h1 class="display-5">Счастливые истории</h1>
+  <p class="lead text-muted">
+    Эти питомцы уже обрели любящую семью. Истории со счастливым концом.
+  </p>
+</div>
+<div class="row mb-4">
+  <div class="col-md-8 mb-3 mb-md-0">
+    <form action="{% url 'animals:stories' %}" method="get" class="d-flex">
+      <input
+        class="form-control me-2"
+        type="search"
+        name="q"
+        placeholder="Поиск по кличке..."
+        value="{{ search_query|default:'' }}"
+        aria-label="Поиск">
+      <button class="btn btn-outline-primary" type="submit">Найти</button>
+    </form>
+    {% if search_query %}
+      <p class="text-muted mt-2 mb-0">
+        Результаты поиска по запросу: <strong>{{ search_query }}</strong>.
+        <a href="{% url 'animals:stories' %}" class="text-decoration-none">
+          Сбросить поиск
+        </a>
+      </p>
+    {% endif %}
+  </div>
+  <div class="col-md-4">
+    <div class="d-flex justify-content-md-end align-items-center">
+      {% with q_part="{% if search_query %}?q={{ search_query }}{% endif %}" %}
+        <span class="me-2 text-muted">Фильтр:</span>
+        <a
+          href="{% url 'animals:stories' %}{{ q_part }}"
+          class="btn btn-outline-secondary btn-sm me-1 active">
+          Все
+        </a>
+      {% endwith %}
+      {% with q_part="{% if search_query %}&q={{ search_query }}{% endif %}" %}
+        {% for value, label in species_choices %}
+          <a
+            href="{% url 'animals:stories' %}?species={{ value }}{{ q_part }}"
+            class="btn btn-outline-secondary btn-sm me-1
+              {% if request.GET.species == value %}active{% endif %}">
+            {{ label }}
+          </a>
+        {% endfor %}
+      {% endwith %}
+    </div>
+  </div>
+</div>
+<div class="row">
+  {% for animal in animals %}
+    {% include "includes/animal_card.html" %}
+    <div class="mt-2 mb-2">
+      <span class="badge bg-success">Дома с {{ animal.adoption_date }}</span>
+    </div>
+    <div class="mt-auto pt-2">
+      <a
+        href="{% url 'animals:animal_detail' %}"
+        class="btn btn-outline-success w-100">
+        Читать историю
+      </a>
+    </div>
+  {% empty %}
+    <div class="text-center py-5">
+      <h3 class="text-muted">Ничего не найдено</h3>
+      <p>По вашему запросу нет пристроенных питомцев.
+        Попробуйте изменить параметры поиска.
+      </p>
+      <a href="{% url 'animals:stories' %}" class="btn btn-primary">
+        Смотреть всех
+      </a>
+    </div>
+  {% endfor %}
+</div>
+{% include "includes/paginator.html" %}
+{% endblock %}

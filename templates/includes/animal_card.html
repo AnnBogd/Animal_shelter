@@ -1,18 +1,29 @@
 <div class="col-md-4 mb-4">
   <div class="card h-100 shadow-sm">
-    <img
-      src={% static 'img/no-photo.png' %}
-      class="card-img-top"
-      alt="{{ animal.species }} {{ animal.name }}">
-    <div class="card-body">
+    {% if animal.photo %}
+      <img
+        src="{{ animal.photo.url }}"
+        class="img-fluid rounded shadow-sm w-100"
+        alt="{{ animal.get_species_display }} {{ animal.name }}">
+    {% else %}
+      <img
+        src="{% static 'img/no-photo.png' %}"
+        class="img-fluid rounded shadow-sm w-100"
+        alt="{{ animal.get_species_display }} {{ animal.name }}">
+    {% endif %}
+    <div class="card-body d-flex flex-column">
       <h5 class="card-title">{{ animal.name }}</h5>
-      <p class="card-text text-muted">
+      <p class="card-text text-muted mb-1">
         {{ animal.species }}, {{ animal.age }}
       </p>
-      <p class="card-text">{{ animal.bio|truncatechars:100 }}</p>
-      <a href="{% url 'animals:animal_detail' %}" class="btn btn-primary">
-        Подробнее
-      </a>
+      <p class="card-text lex-grow-1">{{ animal.bio|truncatechars:100 }}</p>
+      <div class="mt-auto pt-2">
+        <a
+          href="{% url 'animals:animal_detail' %}"
+          class="btn btn-primary w-100">
+          Подробнее
+        </a>
+      </div>
     </div>
   </div>
 </div>

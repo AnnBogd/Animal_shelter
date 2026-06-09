@@ -1,6 +1,8 @@
 """View-функции приложения animals."""
 
 from django.db.models import QuerySet
+from django.forms.models import BaseModelForm
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
@@ -36,7 +38,7 @@ class HomeView(TemplateView):
 
 
 class BaseAnimalListView(ListView):
-    """Базовый CVB для отображения списка животных."""
+    """Базовый CBV для отображения списка животных."""
 
     model = Animal
     paginate_by = 6
@@ -53,16 +55,6 @@ class BaseAnimalListView(ListView):
             queryset = queryset.filter(name__icontains=name)
         return queryset
 
-
-class ShelterAnimalListView(BaseAnimalListView):
-    """CVB для отображения животных, находящихся в приюте."""
-
-    template_name = 'animals/animal_list.html'
-
-    def get_queryset(self) -> QuerySet[Animal]:
-        """Дополнить queryset фильрацией - находится в приюте."""
-        return super().get_queryset().filter(status='shelter')
-
     def get_context_data(self, **kwargs) -> dict:
         """Дополнить словарь контекста."""
         context = super().get_context_data(**kwargs)
@@ -71,8 +63,18 @@ class ShelterAnimalListView(BaseAnimalListView):
         return context
 
 
+class ShelterAnimalListView(BaseAnimalListView):
+    """CBV для отображения животных, находящихся в приюте."""
+
+    template_name = 'animals/animal_list.html'
+
+    def get_queryset(self) -> QuerySet[Animal]:
+        """Дополнить queryset фильрацией - находится в приюте."""
+        return super().get_queryset().filter(status='shelter')
+
+
 class AdoptedAnimalListView(BaseAnimalListView):
-    """CVB для отображения животных, которых забрали домой."""
+    """CBV для отображения животных, которых забрали домой."""
 
     template_name = 'animals/adopted_list.html'
 
@@ -83,22 +85,33 @@ class AdoptedAnimalListView(BaseAnimalListView):
 
 
 class AnimalDetailView(DetailView):
-    """CVB для отображения отдельной страницы животного."""
+    """CBV для отображения отдельной страницы животного."""
 
     model = Animal
-    template_name = 'animal_detail.html'
+    template_name = 'animals/animal_detail.html'
 
 
 class AdoptRequestCreateView(CreateView):
-    """CVB для отображения заявок."""
+    """CBV для отображения заявок."""
 
     model = AdoptionRequest
     fields = ('name', 'phone', 'email', 'comment')
     success_url = reverse_lazy('animals:thanks')
-    template_name = 'adopt_request_form.html'
+    template_name = 'animals/adopt_request_form.html'
 
-    def form_valid(self, form):
+    def get_animal(self) -> Animal:
+        """Получить животное, на которое оформляется заявка."""
+        if not hasattr(self, '_animal'):
+            self._animal = get_object_or_404(Animal, pk=self.kwargs['pk'])
+        return self._animal
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponseRedirect:
         """Привязать животное к форме."""
-        animal = get_object_or_404(Animal, pk=self.kwargs['pk'])
-        form.instance.animal = animal
+        form.instance.animal = self.get_animal()
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs) -> dict:
+        """Дополнить словарь контекста."""
+        context = super().get_context_data(**kwargs)
+        context['animal'] = self.get_animal()
+        return context

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% block title %}Заявка на знакомство с животным{% endblock %}
+{% block content %}
+  <nav aria-label="Навигация" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'animals:home' %}">Главная</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'animals:catalog' %}">Ищут дом</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'animals:animal_detail' animal.pk %}">
+          {{ animal.name }}
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        Заявка на знакомство
+      </li>
+    </ol>
+  </nav>
+  <div class="mb-4">
+    <h1 class="display-5">Заявка на знакомство</h1>
+    <p class="lead text-muted">
+      Вы хотите познакомиться с <strong>{{ animal.name }}</strong>. 
+      Заполните форму, и мы свяжемся с вами в ближайшее время.
+    </p>
+  </div>
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body p-4">
+          <form method="post">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% with text="Отправить заявку" %}
+              {% bootstrap_button button_type="submit" content=text %}
+            {% endwith %}
+            <a
+              href="{% url 'animals:animal_detail' animal.pk %}"
+              class="btn btn-outline-secondary btn-lg">
+              Отмена
+            </a>
+          </form>
+        </div>
+      </div>
+      <p class="text-muted small">
+        * Поля, обязательные для заполнения. Нажимая кнопку «Отправить заявку»,
+        вы соглашаетесь с обработкой персональных данных. Мы не передаём ваши
+        данные третьим лицам.
+      </p>
+    </div>
+    <div class="col-lg-4">
+      <div class="card shadow-sm mb-4">
+        {% if animal.photo %}
+          <img
+            src="{{ animal.photo.url }}"
+            class="img-fluid rounded shadow-sm w-100"
+            alt="{{ animal.get_species_display }} {{ animal.name }}">
+        {% else %}
+          <img
+            src="{% static 'img/no-photo.png' %}"
+            class="img-fluid rounded shadow-sm w-100"
+            alt="{{ animal.get_species_display }} {{ animal.name }}">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ animal.name }}</h5>
+          <p class="card-text text-muted mb-1">
+            {{ animal.get_species_display }}, {{ animal.age }}</p>
+          <p class="card-text small">{{ animal.bio|truncatechars:100 }}</p>
+          <a
+            href="{% url 'animals:animal_detail' animal.pk %}"
+            class="btn btn-outline-primary btn-sm w-100">
+            Вернуться к анкете
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

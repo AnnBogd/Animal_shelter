@@ -23,8 +23,8 @@ class Animal(models.Model):
         ('other', 'Другое'),
     ]
     GENDER_CHOICES = [
-        ('male', 'Самец'),
-        ('female', 'Самка'),
+        ('male', 'самец'),
+        ('female', 'самка'),
     ]
     STATUS_CHOICES = [
         ('shelter', 'В приюте'),
@@ -124,7 +124,7 @@ class Animal(models.Model):
 
     def __str__(self) -> str:
         """Переопределить строковое представление объекта."""
-        return f'{self.name} ({self.species})'
+        return f'{self.name} ({self.get_species_display()})'
 
 
 class AdoptionRequest(models.Model):

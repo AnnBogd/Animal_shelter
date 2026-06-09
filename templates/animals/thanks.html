@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load bootstrap_icons %}
+{% block title %}Заявка принята{% endblock %}
+{% block content %}
+  <div class="text-center py-5">
+    {% bs_icon 'check-circle-fill' size='80px' extra_classes='text-success' %}
+    <h1 class="display-4 mb-3">Спасибо за заявку!</h1>
+    <p class="lead mb-4">
+      Мы получили вашу заявку на знакомство с питомцем.
+    </p>
+    <p class="mb-4">
+      Наш сотрудник свяжется с вами по указанному телефону в ближайшее время.
+      <br>Обычно это занимает один рабочий день.
+    </p>
+    <div class="alert alert-info d-inline-block text-start mb-4">
+      <p class="mb-1"><strong>Что дальше?</strong></p>
+      <ul class="mb-0 ps-3">
+        <li>Мы позвоним, чтобы обсудить детали и ответить на вопросы.</li>
+        <li>Договоримся об удобном времени для визита в приют.</li>
+        <li>Вы познакомитесь с питомцем лично.</li>
+        <li>
+          Если всё сложится — оформим документы и Вы заберёте друга домой!
+        </li>
+      </ul>
+    </div>
+    <div class="mt-4">
+      <a
+        href="{% url 'animals:catalog' %}"
+        class="btn btn-primary btn-lg me-2">
+        Смотреть других питомцев
+      </a>
+      <a
+        href="{% url 'animals:home' %}"
+        class="btn btn-outline-secondary btn-lg">
+        На главную
+      </a>
+    </div>
+  </div>
+{% endblock %}
