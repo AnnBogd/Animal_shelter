@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Страница животного{% endblock %}
 {% block content %}
   <nav aria-label="Навигация" class="mb-4">
@@ -42,7 +43,7 @@
             {% if animal.status == 'shelter' %}bg-warning text-dark
             {% else %}bg-success{% endif %}
             fs-6">
-          {{ animal.status }}
+          {{ animal.get_status_display }}
         </span>
       </div>
       <div class="row mb-3">
@@ -63,7 +64,7 @@
         <div class="col-sm-6 mb-2">
           <p class="mb-1">
             <strong>Пол:</strong>
-            <span class="text-muted">{{ animal.gender }}</span>
+            <span class="text-muted">{{ animal.get_gender_display }}</span>
           </p>
         </div>
         <div class="col-sm-6 mb-2">
@@ -75,7 +76,9 @@
         <div class="col-sm-6 mb-2">
           <p class="mb-1">
             <strong>Дата рождения:</strong>
-            <span class="text-muted">{{ animal.birth_date|date:"j E Y" }}</span>
+            <span class="text-muted">
+              {{ animal.birth_date|date:"j E Y" }}
+            </span>
           </p>
         </div>
         <div class="col-sm-6 mb-2">
@@ -111,7 +114,9 @@
     <div class="col-sm-6 mb-2">
       <p class="mb-1">
         <strong>Дома с:</strong>
-        <span class="text-muted">{{ animal.adoption_date|date:"j E Y" }}</span>
+        <span class="text-muted">
+          {{ animal.adoption_date|date:"j E Y" }}
+        </span>
       </p>
     </div>
     <div class="alert alert-success mt-3">
@@ -119,44 +124,25 @@
         🎉
         <strong>
           {{ animal.name }}
-          {% if animal.gender == 'самец' %}обрёл{% else %}обрела
+          {% if animal.gender == 'male' %}обрёл{% else %}обрела{% endif %}
           дом!
         </strong>
         Эта история со счастливым концом.
       </p>
     </div>
   {% endif %}
-
-  <!-- Галерея (дополнительные фото, если будут) -->
-  <!--
-  <div class="row mb-5">
-      <div class="col-12">
-          <h2>Фотогалерея</h2>
-          <hr>
-          <div class="row">
-              <div class="col-4 col-md-3 mb-3">
-                  <img src="https://placehold.co/300x300?text=Фото+1" class="img-fluid rounded" alt="Барсик фото 1">
-              </div>
-              <div class="col-4 col-md-3 mb-3">
-                  <img src="https://placehold.co/300x300?text=Фото+2" class="img-fluid rounded" alt="Барсик фото 2">
-              </div>
-              <div class="col-4 col-md-3 mb-3">
-                  <img src="https://placehold.co/300x300?text=Фото+3" class="img-fluid rounded" alt="Барсик фото 3">
-              </div>
-          </div>
-      </div>
-  </div>
-  -->
-
   <div class="mb-5">
     {% if animal.status == 'shelter' %}
-      <a href="{% url 'animals:catalog' %}" class="btn btn-outline-secondary">
-        &larr; Вернуться к списку
-      </a>
+      {% url 'animals:catalog' as default_url %}
     {% else %}
-      <a href="{% url 'animals:stories' %}" class="btn btn-outline-secondary">
+      {% url 'animals:stories' as default_url %}
+    {% endif %}
+    {% with dst=next|default:default_url %}
+      <a
+        href="{{ dst }}{% if anchor %}#{{ anchor }}{% endif %}"
+        class="btn btn-outline-secondary">
         &larr; Вернуться к списку
       </a>
-    {% endif %}
+    {% endwith %}
   </div>
 {% endblock %}

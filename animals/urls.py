@@ -11,7 +11,7 @@ from .views import (
     ShelterAnimalListView
 )
 
-namespace = 'animals'
+app_name = 'animals'
 
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
@@ -19,7 +19,7 @@ urlpatterns = [
     path('stories/', AdoptedAnimalListView.as_view(), name='stories'),
     path(
         'thanks/',
-        TemplateView.as_view(template_name='thanks.html'),
+        TemplateView.as_view(template_name='animals/thanks.html'),
         name='thanks'
     ),
     path(

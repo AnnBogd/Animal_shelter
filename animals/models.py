@@ -63,6 +63,8 @@ class Animal(models.Model):
     photo = models.ImageField(
         verbose_name='Фото',
         upload_to='animals/',
+        blank=True,
+        null=True,
     )
     slug = models.SlugField(
         unique=True,
@@ -120,7 +122,7 @@ class Animal(models.Model):
 
     def get_absolute_url(self) -> str:
         """Вернуть URL объекта."""
-        return reverse('animal_detail', kwargs={'slug': self.slug})
+        return reverse('animal_detail', kwargs={'pk': self.pk})
 
     def __str__(self) -> str:
         """Переопределить строковое представление объекта."""
@@ -156,3 +158,7 @@ class AdoptionRequest(models.Model):
         verbose_name='Статус обработки заявки',
         default=False,
     )
+
+    class Meta:
+        verbose_name = 'заявка'
+        verbose_name_plural = 'заявки'

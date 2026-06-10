@@ -17,7 +17,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'animals.apps.AnimalsConfig',
     'django_bootstrap5',
-    'django_bootstrap_icons',
 ]
 
 MIDDLEWARE = [
@@ -88,3 +87,7 @@ STATICFILES_DIRS = [
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
+ADMIN_EMAIL = 'admin@example.com'

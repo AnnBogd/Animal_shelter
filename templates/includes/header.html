@@ -1,32 +1,43 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-  <div class="container">
-    <a class="navbar-brand" href="{% url 'animals:home' %}">
-      🐾 Приют «Добрый дом»
-    </a>
-    <button
-      class="navbar-toggler" type="button" data-bs-toggle="collapse"
-      data-bs-target="#navbarNav" aria-controls="navbarNav"
-      aria-expanded="false" aria-label="Переключить навигацию">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'animals:home' %}">
-            Главная
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'animals:catalog' %}">
-            Ищут дом
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'animals:stories' %}">
-            Счастливые истории
-          </a>
-        </li>
-      </ul>
+{% with path_url=request.resolver_match.view_name %}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'animals:home' %}">
+        🐾 Приют «Добрый дом»
+      </a>
+      <button
+        class="navbar-toggler" type="button" data-bs-toggle="collapse"
+        data-bs-target="#navbarNav" aria-controls="navbarNav"
+        aria-expanded="false" aria-label="Переключить навигацию">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a
+              class="nav-link
+              {% if path_url == 'animals:home' %}active{% endif %}"
+              href="{% url 'animals:home' %}">
+              Главная
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link
+              {% if path_url == 'animals:catalog' %}active{% endif %}"
+              href="{% url 'animals:catalog' %}">
+              Ищут дом
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link
+              {% if path_url == 'animals:stories' %}active{% endif %}"
+              href="{% url 'animals:stories' %}">
+              Счастливые истории
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
+{% endwith %}

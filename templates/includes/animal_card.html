@@ -1,4 +1,6 @@
-<div class="col-md-4 mb-4">
+{% load static %}
+{% load i18n %}
+<div id="animal-{{ animal.pk }}" class="col-md-4 mb-4">
   <div class="card h-100 shadow-sm">
     {% if animal.photo %}
       <img
@@ -14,16 +16,34 @@
     <div class="card-body d-flex flex-column">
       <h5 class="card-title">{{ animal.name }}</h5>
       <p class="card-text text-muted mb-1">
-        {{ animal.species }}, {{ animal.age }}
+        {{ animal.get_species_display }}, {{ animal.age }}
       </p>
       <p class="card-text lex-grow-1">{{ animal.bio|truncatechars:100 }}</p>
-      <div class="mt-auto pt-2">
-        <a
-          href="{% url 'animals:animal_detail' %}"
-          class="btn btn-primary w-100">
-          Подробнее
-        </a>
-      </div>
+      {% with nxt=request.get_full_path|urlencode %}
+        {% url 'animals:animal_detail' animal.pk as base_url %}
+        {% blocktranslate asvar link with animal_id=animal.pk %}
+          {{ base_url }}?next={{ nxt }}&anchor=animal-{{ animal_id }}
+        {% endblocktranslate %}
+        {% if animal.status == 'adopted' %}
+          <div class="mt-2 mb-2">
+            <span class="badge bg-success">
+              Дома с {{ animal.adoption_date }}
+            </span>
+          </div>
+        {% endif %}
+        <div class="mt-auto pt-2">
+          <a href="{{ link }}" 
+            class="btn 
+              {% if animal.status == 'adopted' %}btn-outline-success
+              {% else %}btn-primary{% endif %} w-100">
+            {% if animal.status == 'adopted' %}
+              Читать историю
+            {% else %}
+              Подробнее
+            {% endif %}
+          </a>
+        </div>
+      {% endwith %}
     </div>
   </div>
 </div>

@@ -327,3 +327,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+animals/fixtures
+media
+static
+sent_emails

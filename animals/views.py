@@ -1,13 +1,28 @@
 """View-функции приложения animals."""
 
+from django.conf import settings
+from django.core.mail import EmailMessage
 from django.db.models import QuerySet
-from django.forms.models import BaseModelForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
 
+from .forms import AdoptionRequestForm
 from .models import AdoptionRequest, Animal
+
+
+class ReadableEmailMessage(EmailMessage):
+    """Кастомный класс письма, который не шифрует русский текст.
+
+    Удалить в релизе.
+    """
+
+    def message(self):
+        msg = super().message()
+        if 'Content-Transfer-Encoding' in msg:
+            del msg['Content-Transfer-Encoding']
+        return msg
 
 
 class HomeView(TemplateView):
@@ -33,6 +48,7 @@ class HomeView(TemplateView):
         context['recent_animals'] = (
             Animal
             .objects
+            .filter(status='shelter')
             .order_by('-arrival_date')[:3])
         return context
 
@@ -90,12 +106,19 @@ class AnimalDetailView(DetailView):
     model = Animal
     template_name = 'animals/animal_detail.html'
 
+    def get_context_data(self, **kwargs) -> dict:
+        """Дополнить словарь контекста."""
+        context = super().get_context_data(**kwargs)
+        context['next'] = self.request.GET.get('next', '')
+        context['anchor'] = self.request.GET.get('anchor', '')
+        return context
+
 
 class AdoptRequestCreateView(CreateView):
     """CBV для отображения заявок."""
 
     model = AdoptionRequest
-    fields = ('name', 'phone', 'email', 'comment')
+    form_class = AdoptionRequestForm
     success_url = reverse_lazy('animals:thanks')
     template_name = 'animals/adopt_request_form.html'
 
@@ -105,10 +128,33 @@ class AdoptRequestCreateView(CreateView):
             self._animal = get_object_or_404(Animal, pk=self.kwargs['pk'])
         return self._animal
 
-    def form_valid(self, form: BaseModelForm) -> HttpResponseRedirect:
-        """Привязать животное к форме."""
+    def form_valid(self, form: AdoptionRequestForm) -> HttpResponseRedirect:
+        """Привязать животное к форме и отправить админу email."""
         form.instance.animal = self.get_animal()
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        self.send_notification_email(form)
+        return response
+
+    def send_notification_email(self, form):
+        """Отправить админу email о созданной заявке."""
+
+        adoption_request = form.instance
+        animal = adoption_request.animal
+        email = ReadableEmailMessage(
+            subject=f'Новая заявка на {animal.name}',
+            body=f'''
+Поступила новая заявка на знакомство:
+Животное: {animal.name} ({animal.get_species_display()})
+Имя пользователя: {adoption_request.name}
+Телефон пользователя: {adoption_request.phone}
+Email пользователя: {adoption_request.email}
+Комментарий: {adoption_request.comment}
+''',
+            from_email='noreply@example.com',
+            to=[settings.ADMIN_EMAIL],
+        )
+        email.encoding = 'utf-8'
+        email.send(fail_silently=True)
 
     def get_context_data(self, **kwargs) -> dict:
         """Дополнить словарь контекста."""

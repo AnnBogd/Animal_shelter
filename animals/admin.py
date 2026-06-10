@@ -38,7 +38,7 @@ class AnimalAdmin(admin.ModelAdmin):
                  'border-radius: 4px;" />'),
                 obj.photo.url
             )
-        return format_html('<span style="color: gray;">Нет фото</span>')
+        return "—"
 
 
 @admin.register(AdoptionRequest)

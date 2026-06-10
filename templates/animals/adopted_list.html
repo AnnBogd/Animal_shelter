@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block title %}Счастливые истории — Приют «Добрый дом»{% endblock %}
 {% block content %}
 <div class="mb-4">
@@ -29,41 +30,45 @@
     {% endif %}
   </div>
   <div class="col-md-4">
-    <div class="d-flex justify-content-md-end align-items-center">
-      {% with q_part="{% if search_query %}?q={{ search_query }}{% endif %}" %}
-        <span class="me-2 text-muted">Фильтр:</span>
+    <div class="d-flex justify-content-md-end align-items-center flex-wrap">
+      <span class="me-2 text-muted">Фильтр:</span>
+      <div class="d-flex flex-wrap gap-1">
+        {% url 'animals:stories' as base_url %}
+        {% if search_query %}
+          {% blocktranslate asvar url_all %}
+            {{ base_url }}?q={{ search_query }}
+          {% endblocktranslate %}
+        {% endif %}
         <a
-          href="{% url 'animals:stories' %}{{ q_part }}"
-          class="btn btn-outline-secondary btn-sm me-1 active">
+          href="{{ url_all|default:base_url }}"
+          class="btn btn-outline-secondary btn-sm me-1
+            {% if not request.GET.species %}active{% endif %}">
           Все
         </a>
-      {% endwith %}
-      {% with q_part="{% if search_query %}&q={{ search_query }}{% endif %}" %}
         {% for value, label in species_choices %}
+          {% if search_query %}
+            {% blocktranslate asvar url_species with sp=value q=search_query %}
+              {{ base_url }}?species={{ sp }}&q={{ q }}
+            {% endblocktranslate %}
+          {% else %}
+            {% blocktranslate asvar url_species with sp=value %}
+              {{ base_url }}?species={{ sp }}
+            {% endblocktranslate %}
+          {% endif %}
           <a
-            href="{% url 'animals:stories' %}?species={{ value }}{{ q_part }}"
+            href="{{ url_species }}"
             class="btn btn-outline-secondary btn-sm me-1
               {% if request.GET.species == value %}active{% endif %}">
             {{ label }}
           </a>
         {% endfor %}
-      {% endwith %}
+      </div>
     </div>
   </div>
 </div>
 <div class="row">
   {% for animal in animals %}
     {% include "includes/animal_card.html" %}
-    <div class="mt-2 mb-2">
-      <span class="badge bg-success">Дома с {{ animal.adoption_date }}</span>
-    </div>
-    <div class="mt-auto pt-2">
-      <a
-        href="{% url 'animals:animal_detail' %}"
-        class="btn btn-outline-success w-100">
-        Читать историю
-      </a>
-    </div>
   {% empty %}
     <div class="text-center py-5">
       <h3 class="text-muted">Ничего не найдено</h3>
