@@ -17,13 +17,13 @@ cd Animal_shelter
 
 2. Создать и активировать виртуальное окружение (ОС Windows)
 ```
-python -m vevn venv
+python -m venv venv
 source venv/Scripts/activate
 ```
 
 3. Установить зависимости:
 ```
-pip install -r requirements
+pip install -r requirements.txt
 ```
 
 4. Создать миграции
